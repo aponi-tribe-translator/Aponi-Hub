@@ -50,6 +50,7 @@
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s ease;
+            margin: 10px;
         }
         .translate-button:hover {
             background-color: #ffcc00; /* Darker banana yellow on hover */
@@ -64,6 +65,10 @@
             border-radius: 4px;
             resize: none;
             background-color: #eee;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
         }
     </style>
 </head>
@@ -88,8 +93,11 @@
         <input type="number" class="shift-input" id="shift10" placeholder="1-26" min="1" max="26">
     </div>
 
-    <!-- Translate button -->
-    <button class="translate-button" onclick="translateText()">Translate Text</button>
+    <!-- Action buttons for encoding and decoding -->
+    <div class="action-buttons">
+        <button class="translate-button" onclick="translateText('encode')">Encode Text</button>
+        <button class="translate-button" onclick="translateText('decode')">Decode Text</button>
+    </div>
 
     <!-- Output area -->
     <textarea class="output-text" id="outputText" readonly placeholder="Output will appear here..."></textarea>
@@ -100,14 +108,14 @@
             return str.split('').map(char => {
                 if (/[a-zA-Z]/.test(char)) {
                     const base = char === char.toLowerCase() ? 97 : 65;
-                    return String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26) + base);
+                    return String.fromCharCode(((char.charCodeAt(0) - base + shift + 26) % 26) + base);
                 }
                 return char;
             }).join('');
         }
 
-        // Function to translate the text using the 10 shift inputs
-        function translateText() {
+        // Function to translate the text based on encode or decode mode
+        function translateText(mode) {
             let text = document.getElementById('inputText').value;
             const shifts = [];
 
@@ -117,9 +125,9 @@
                 shifts.push(shiftValue);
             }
             
-            // Apply each shift sequentially
+            // Apply each shift sequentially based on the selected mode
             shifts.forEach(shift => {
-                text = caesarShift(text, shift);
+                text = caesarShift(text, mode === 'encode' ? shift : -shift);
             });
 
             // Display the output
