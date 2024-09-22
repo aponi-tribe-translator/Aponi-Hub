@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aponi Translator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .input-text {
+            width: 80%;
+            height: 100px;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+        .shift-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .shift-input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .translate-button {
+            background-color: #ffd700; /* Banana yellow */
+            color: red;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .translate-button:hover {
+            background-color: #ffcc00; /* Darker banana yellow on hover */
+        }
+        .output-text {
+            margin-top: 20px;
+            width: 80%;
+            height: 100px;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Aponi Translator</h1>
+
+    <!-- Text input for the user -->
+    <textarea class="input-text" id="inputText" placeholder="Enter text here..."></textarea>
+
+    <!-- Shift input boxes -->
+    <div class="shift-boxes">
+        <input type="number" class="shift-input" id="shift1" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift2" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift3" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift4" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift5" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift6" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift7" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift8" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift9" placeholder="1-26" min="1" max="26">
+        <input type="number" class="shift-input" id="shift10" placeholder="1-26" min="1" max="26">
+    </div>
+
+    <!-- Translate button -->
+    <button class="translate-button" onclick="translateText()">Translate Text</button>
+
+    <!-- Output area -->
+    <textarea class="output-text" id="outputText" readonly placeholder="Output will appear here..."></textarea>
+
+    <script>
+        // Function to perform Caesar cipher shift
+        function caesarShift(str, shift) {
+            return str.split('').map(char => {
+                if (/[a-zA-Z]/.test(char)) {
+                    const base = char === char.toLowerCase() ? 97 : 65;
+                    return String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26) + base);
+                }
+                return char;
+            }).join('');
+        }
+
+        // Function to translate the text using the 10 shift inputs
+        function translateText() {
+            let text = document.getElementById('inputText').value;
+            const shifts = [];
+
+            // Collect shift values from the 10 input boxes
+            for (let i = 1; i <= 10; i++) {
+                const shiftValue = parseInt(document.getElementById(`shift${i}`).value) || 0;
+                shifts.push(shiftValue);
+            }
+            
+            // Apply each shift sequentially
+            shifts.forEach(shift => {
+                text = caesarShift(text, shift);
+            });
+
+            // Display the output
+            document.getElementById('outputText').value = text;
+        }
+    </script>
+
+</body>
+</html>
