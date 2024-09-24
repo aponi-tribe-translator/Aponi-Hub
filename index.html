@@ -70,6 +70,19 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+        .shift-string-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .shift-string {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -93,6 +106,14 @@
     <div id="encodedTranslator" style="display: none;">
         <h1>Aponi Translator (Encoded)</h1>
         <textarea class="input-text" id="inputTextEncoded" placeholder="Enter text here..."></textarea>
+
+        <!-- Shift string input with copy button -->
+        <div class="shift-string-container">
+            <input type="text" class="shift-string" id="shiftString" placeholder="Enter shifts (e.g., 5 4 5 4 5 4 5 4 5 4)">
+            <button class="button" onclick="copyToClipboard('shiftString')">Copy</button>
+        </div>
+
+        <!-- Individual shift inputs -->
         <div class="shift-boxes">
             <input type="number" class="shift-input" id="shift1" placeholder="1-26" min="1" max="26">
             <input type="number" class="shift-input" id="shift2" placeholder="1-26" min="1" max="26">
@@ -105,10 +126,13 @@
             <input type="number" class="shift-input" id="shift9" placeholder="1-26" min="1" max="26">
             <input type="number" class="shift-input" id="shift10" placeholder="1-26" min="1" max="26">
         </div>
+
+        <!-- Action buttons -->
         <div class="action-buttons">
             <button class="button" onclick="translateText('encode', 'inputTextEncoded', 'outputTextEncoded')">Encode Text</button>
             <button class="button" onclick="translateText('decode', 'inputTextEncoded', 'outputTextEncoded')">Decode Text</button>
         </div>
+
         <textarea class="output-text" id="outputTextEncoded" readonly placeholder="Output will appear here..."></textarea>
         <button class="button" onclick="copyToClipboard('outputTextEncoded')">Copy</button>
         <button class="button back-button" onclick="showPage('homePage')">Back to Home</button>
@@ -150,15 +174,35 @@
         // Function to handle encode and decode text for the encoded translator
         function translateText(mode, inputId, outputId) {
             let text = document.getElementById(inputId).value;
-            const shifts = [];
-            for (let i = 1; i <= 10; i++) {
-                const shiftValue = parseInt(document.getElementById(`shift${i}`).value) || 0;
-                shifts.push(shiftValue);
-            }
+            let shifts = getShifts();
+
+            // Apply each shift sequentially based on the selected mode
             shifts.forEach(shift => {
                 text = caesarShift(text, mode === 'encode' ? shift : -shift);
             });
+
+            // Display the output
             document.getElementById(outputId).value = text;
+        }
+
+        // Function to get shift values from the shift string or individual inputs
+        function getShifts() {
+            const shiftString = document.getElementById('shiftString').value.trim();
+            let shifts = [];
+
+            // If a shift string is provided, use it
+            if (shiftString) {
+                shifts = shiftString.split(' ').map(shift => parseInt(shift)).slice(0, 10);
+            }
+            // Otherwise, get shifts from individual input boxes
+            if (shifts.length !== 10) {
+                shifts = [];
+                for (let i = 1; i <= 10; i++) {
+                    const shiftValue = parseInt(document.getElementById(`shift${i}`).value) || 0;
+                    shifts.push(shiftValue);
+                }
+            }
+            return shifts;
         }
 
         // Function to handle the regular Aponi translation
@@ -171,12 +215,12 @@
             document.getElementById('outputTextRegular').value = text;
         }
 
-        // Function to copy output text to clipboard
-        function copyToClipboard(outputId) {
-            const outputText = document.getElementById(outputId);
-            outputText.select();
-            outputText.setSelectionRange(0, 99999); // For mobile devices
-            navigator.clipboard.writeText(outputText.value)
+        // Function to copy text to clipboard from any input or textarea
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(element.value || element.innerText)
                 .then(() => alert('Text copied to clipboard!'))
                 .catch(() => alert('Failed to copy text.'));
         }
